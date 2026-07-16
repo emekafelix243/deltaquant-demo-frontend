@@ -64,7 +64,7 @@ export default function AppShell({ active, username, role, children }: AppShellP
                       </span>
                     </span>
                   </div>
-                  <div className="w-full bg-gray-700 rounded-full h-1.5 mt-2 max-w-md">
+                  <div className="w-full bg-gray-700 rounded-full h-1.5 mt-2">
                     <div
                       className={`h-1.5 rounded-full ${limitReached ? "bg-red-500" : "bg-blue-500"}`}
                       style={{ width: `${Math.min(100, (demoStatus.used / demoStatus.limit) * 100)}%` }}

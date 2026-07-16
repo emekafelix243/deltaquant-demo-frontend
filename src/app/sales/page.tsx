@@ -32,6 +32,7 @@ export default function SalesPage() {
   const [barcode, setBarcode] = useState("");
   const [barcodeError, setBarcodeError] = useState("");
   const [showCart, setShowCart] = useState(false);
+  const [showDemoLimitModal, setShowDemoLimitModal] = useState(false);
   const barcodeRef = useRef<HTMLInputElement>(null);
 
   const loadProducts = useCallback(() => {
@@ -115,8 +116,15 @@ export default function SalesPage() {
       loadProducts();
       setTimeout(() => setSuccess(null), 10000);
       setTimeout(() => barcodeRef.current?.focus(), 100);
-    } catch {
-      alert("Sale failed. Check stock levels.");
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { status?: number; data?: { detail?: string } } };
+      const status = axiosErr?.response?.status;
+      const detail = axiosErr?.response?.data?.detail ?? "";
+      if (status === 403 && detail.toLowerCase().includes("demo")) {
+        setShowDemoLimitModal(true);
+      } else {
+        alert("Sale failed. Check stock levels.");
+      }
     } finally {
       setLoading(false);
     }
@@ -126,7 +134,6 @@ export default function SalesPage() {
     <div className="bg-gray-800 flex flex-col h-full">
       <div className="p-4 border-b border-gray-700 flex items-center justify-between">
         <h2 className="text-xl font-bold">Cart</h2>
-        {/* Close button only on mobile */}
         <button
           className="lg:hidden text-gray-400 hover:text-white text-sm"
           onClick={() => setShowCart(false)}
@@ -197,14 +204,11 @@ export default function SalesPage() {
 
   return (
     <AppShell active="sales" username={user?.username} role={user?.role}>
-      {/* On lg+: side-by-side. On mobile: products full width, cart is a floating drawer. */}
       <div className="flex h-[calc(100vh-64px)]">
 
-        {/* Products Panel */}
         <div className="flex-1 min-w-0 p-4 sm:p-6 overflow-y-auto">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold">Products</h2>
-            {/* Mobile cart toggle */}
             <button
               className="lg:hidden relative bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded-lg text-sm font-medium transition"
               onClick={() => setShowCart(true)}
@@ -218,7 +222,6 @@ export default function SalesPage() {
             </button>
           </div>
 
-          {/* Barcode Input */}
           <div className="mb-4">
             <div className="flex flex-wrap gap-2 items-center">
               <div className="relative flex-1 min-w-0 max-w-sm">
@@ -266,12 +269,10 @@ export default function SalesPage() {
           </div>
         </div>
 
-        {/* Desktop Cart — always visible on lg+ */}
         <div className="hidden lg:flex flex-col w-80 border-l border-gray-700 shrink-0">
           {cartPanel}
         </div>
 
-        {/* Mobile Cart — slide-in overlay */}
         {showCart && (
           <div className="lg:hidden fixed inset-0 z-50 flex">
             <div className="flex-1 bg-black/60" onClick={() => setShowCart(false)} />
@@ -281,6 +282,34 @@ export default function SalesPage() {
           </div>
         )}
       </div>
+
+      {showDemoLimitModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[60] px-4">
+          <div className="bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center border border-gray-700">
+            <div className="mx-auto w-16 h-16 rounded-full bg-red-500/15 flex items-center justify-center mb-4">
+              <span className="text-3xl">🔒</span>
+            </div>
+            <h3 className="text-white text-xl font-bold mb-2">Daily Limit Reached</h3>
+            <p className="text-gray-400 text-sm mb-6">
+              You&apos;ve used all 10 free demo transactions for today. Get the full desktop app for unlimited sales — no daily limits, fully offline.
+            </p>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={() => router.push("/purchase")}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition"
+              >
+                Get Full Version
+              </button>
+              <button
+                onClick={() => setShowDemoLimitModal(false)}
+                className="w-full bg-gray-700 hover:bg-gray-600 text-gray-300 py-2.5 rounded-lg text-sm transition"
+              >
+                Maybe later
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AppShell>
   );
 }
