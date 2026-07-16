@@ -68,4 +68,6 @@ export const initializePayment = (email: string) =>
 export const verifyOrder = (reference: string) =>
   api.get(`/payments/verify/${reference}`);
 
+export const getDemoStatus = () => api.get("/sales/demo-status");
+
 export default api;
