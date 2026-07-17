@@ -45,13 +45,17 @@ function SuccessContent() {
   }, [reference]);
 
   const downloadUrl = downloadToken
-  ? `https://deltaquant-demo-backend.onrender.com/payments/download/${downloadToken}`
-  : null;
+    ? `https://deltaquant-demo-backend.onrender.com/payments/download/${downloadToken}`
+    : null;
 
   const goToDownload = () => {
     if (downloadUrl) {
       window.location.href = downloadUrl;
     }
+  };
+
+  const goToUserGuide = () => {
+    window.location.href = "/DeltaQuant_POS_User_Guide.pdf";
   };
 
   return (
@@ -81,6 +85,12 @@ function SuccessContent() {
               className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition"
             >
               Download DeltaQuant POS
+            </button>
+            <button
+              onClick={goToUserGuide}
+              className="mt-3 w-full bg-gray-700 hover:bg-gray-600 text-gray-200 py-2.5 rounded-lg text-sm font-medium transition"
+            >
+              📄 Download User Guide (PDF)
             </button>
           </>
         )}
