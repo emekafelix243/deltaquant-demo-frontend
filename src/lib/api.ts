@@ -51,6 +51,14 @@ export const createSale = (data: object) => api.post("/sales/", data);
 export const getSales = () => api.get("/sales/");
 export const getSale = (id: number) => api.get(`/sales/${id}`);
 
+// Customers / Credit
+export const getCustomers = () => api.get("/customers/");
+export const createCustomer = (data: { name: string; phone?: string }) =>
+  api.post("/customers/", data);
+export const getCustomer = (id: number) => api.get(`/customers/${id}`);
+export const recordPayment = (id: number, data: { amount: number; note?: string }) =>
+  api.post(`/customers/${id}/payments`, data);
+
 // Receipts
 export const getReceipt = (saleId: number) => api.get(`/receipts/${saleId}`);
 

@@ -3,7 +3,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { getProducts, createSale } from "@/lib/api";
+import { getProducts, createSale, getCustomers } from "@/lib/api";
 import { getUser } from "@/lib/auth";
 import { Product } from "@/types";
 import AppShell from "@/components/AppShell";
@@ -20,6 +20,13 @@ interface SaleSuccess {
   total: string;
 }
 
+interface Customer {
+  id: number;
+  name: string;
+  phone?: string;
+  balance: number;
+}
+
 export default function SalesPage() {
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
@@ -34,6 +41,8 @@ export default function SalesPage() {
   const [showCart, setShowCart] = useState(false);
   const [showDemoLimitModal, setShowDemoLimitModal] = useState(false);
   const barcodeRef = useRef<HTMLInputElement>(null);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customerId, setCustomerId] = useState<number | "">("");
 
   const loadProducts = useCallback(() => {
     getProducts().then((res) => setProducts(res.data));
@@ -44,6 +53,7 @@ export default function SalesPage() {
     if (!currentUser) { router.push("/login"); return; }
     setUser(currentUser);
     loadProducts();
+    getCustomers().then((res) => setCustomers(res.data)).catch(() => setCustomers([]));
   }, [router, loadProducts]);
 
   useEffect(() => {
@@ -100,10 +110,15 @@ export default function SalesPage() {
 
   const handleCheckout = async () => {
     if (cart.length === 0) return;
+    if (paymentMethod === "credit" && !customerId) {
+      alert("Please select a customer for credit sales.");
+      return;
+    }
     setLoading(true);
     try {
       const saleData = {
         payment_method: paymentMethod, discount,
+        customer_id: paymentMethod === "credit" ? customerId : null,
         items: cart.map((i) => ({
           product_id: i.product_id, quantity: i.quantity, unit_price: i.unit_price,
         })),
@@ -112,6 +127,7 @@ export default function SalesPage() {
       setSuccess({ saleId: res.data.id, total: grandTotal.toLocaleString() });
       setCart([]);
       setDiscount(0);
+      setCustomerId("");
       setShowCart(false);
       loadProducts();
       setTimeout(() => setSuccess(null), 10000);
@@ -123,7 +139,7 @@ export default function SalesPage() {
       if (status === 403 && detail.toLowerCase().includes("demo")) {
         setShowDemoLimitModal(true);
       } else {
-        alert("Sale failed. Check stock levels.");
+        alert(detail || "Sale failed. Check stock levels.");
       }
     } finally {
       setLoading(false);
@@ -184,13 +200,31 @@ export default function SalesPage() {
         </div>
         <select
           value={paymentMethod}
-          onChange={(e) => setPaymentMethod(e.target.value)}
+          onChange={(e) => {
+            setPaymentMethod(e.target.value);
+            if (e.target.value !== "credit") setCustomerId("");
+          }}
           className="w-full bg-gray-700 text-white px-3 py-2 rounded-lg"
         >
           <option value="cash">Cash</option>
           <option value="card">Card</option>
           <option value="transfer">Transfer</option>
+          <option value="credit">Credit</option>
         </select>
+        {paymentMethod === "credit" && (
+          <select
+            value={customerId}
+            onChange={(e) => setCustomerId(e.target.value ? Number(e.target.value) : "")}
+            className="w-full bg-gray-700 text-white px-3 py-2 rounded-lg border border-yellow-600"
+          >
+            <option value="">Select customer...</option>
+            {customers.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name} {c.balance > 0 ? `(owes ₦${c.balance.toLocaleString()})` : ""}
+              </option>
+            ))}
+          </select>
+        )}
         <button
           onClick={handleCheckout}
           disabled={loading || cart.length === 0}

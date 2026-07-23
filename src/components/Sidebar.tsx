@@ -2,7 +2,7 @@
 "use client";
 
 interface SidebarProps {
-  active: "dashboard" | "products" | "inventory" | "sales" | "reports" | "users";
+  active: "dashboard" | "products" | "inventory" | "sales" | "customers" | "reports" | "users";
   role?: string;
   open?: boolean;
   onClose?: () => void;
@@ -13,9 +13,9 @@ const links = [
   { href: "/products", icon: "📦", label: "Products", key: "products" },
   { href: "/inventory", icon: "🗃️", label: "Inventory", key: "inventory" },
   { href: "/sales", icon: "🛒", label: "Sales", key: "sales" },
+  { href: "/customers", icon: "🧾", label: "Customers", key: "customers" },
   { href: "/reports", icon: "📈", label: "Reports", key: "reports" },
 ];
-
 export default function Sidebar({ active, role, open, onClose }: SidebarProps) {
   const navContent = (
     <nav className="space-y-1 p-4">

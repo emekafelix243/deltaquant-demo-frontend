@@ -7,7 +7,7 @@ import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
 import { getDemoStatus } from "@/lib/api";
 
-type ActivePage = "dashboard" | "products" | "inventory" | "sales" | "reports" | "users";
+type ActivePage = "dashboard" | "products" | "inventory" | "sales" | "customers" | "reports" | "users";
 
 interface AppShellProps {
   active: ActivePage;
