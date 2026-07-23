@@ -73,6 +73,10 @@ export const downloadBackup = () =>
 export const initializePayment = (email: string) =>
   api.post("/payments/initialize", { email });
 
+// Settings
+export const getOrganizationSettings = () => api.get("/settings/organization");
+export const updateOrganizationSettings = (data: object) => api.put("/settings/organization", data);
+
 export const verifyOrder = (reference: string) =>
   api.get(`/payments/verify/${reference}`);
 

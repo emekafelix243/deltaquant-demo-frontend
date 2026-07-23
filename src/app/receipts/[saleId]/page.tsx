@@ -3,23 +3,36 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { getReceipt } from "@/lib/api";
+import { getReceipt, getOrganizationSettings } from "@/lib/api";
 import { getUser } from "@/lib/auth";
 import { Receipt } from "@/types";
 import Image from "next/image";
+
+interface OrgSettings {
+  business_name: string;
+  address: string;
+  phone: string;
+}
 
 export default function ReceiptPage() {
   const router = useRouter();
   const params = useParams();
   const saleId = params?.saleId;
   const [receipt, setReceipt] = useState<Receipt | null>(null);
+  const [org, setOrg] = useState<OrgSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<{ username: string; role: string } | null>(null);
 
   const loadReceipt = useCallback(() => {
     if (saleId) {
-      getReceipt(Number(saleId))
-        .then((res) => setReceipt(res.data))
+      Promise.all([
+        getReceipt(Number(saleId)),
+        getOrganizationSettings(),
+      ])
+        .then(([receiptRes, orgRes]) => {
+          setReceipt(receiptRes.data);
+          setOrg(orgRes.data);
+        })
         .catch(() => alert("Receipt not found."))
         .finally(() => setLoading(false));
     }
@@ -100,9 +113,9 @@ export default function ReceiptPage() {
               className="object-contain"
             />
             <div className="text-right">
-              <h1 className="text-lg font-bold uppercase">Delta Quant Solutions</h1>
-              <p className="text-gray-500 text-xs">53 Afolabi Obey Street, Ejigbo, Lagos</p>
-              <p className="text-gray-500 text-xs">Tel: 08038882485, 08168424165</p>
+              <h1 className="text-lg font-bold uppercase">{org?.business_name || "Your Business Name"}</h1>
+              {org?.address && <p className="text-gray-500 text-xs">{org.address}</p>}
+              {org?.phone && <p className="text-gray-500 text-xs">Tel: {org.phone}</p>}
               <p className="text-xs font-semibold tracking-widest uppercase text-gray-600 mt-1">Official Receipt</p>
             </div>
           </div>

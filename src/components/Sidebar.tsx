@@ -2,7 +2,7 @@
 "use client";
 
 interface SidebarProps {
-  active: "dashboard" | "products" | "inventory" | "sales" | "customers" | "reports" | "users";
+  active: "dashboard" | "products" | "inventory" | "sales" | "customers" | "reports" | "users" | "settings";
   role?: string;
   open?: boolean;
   onClose?: () => void;
@@ -16,6 +16,7 @@ const links = [
   { href: "/customers", icon: "🧾", label: "Customers", key: "customers" },
   { href: "/reports", icon: "📈", label: "Reports", key: "reports" },
 ];
+
 export default function Sidebar({ active, role, open, onClose }: SidebarProps) {
   const navContent = (
     <nav className="space-y-1 p-4">
@@ -26,10 +27,16 @@ export default function Sidebar({ active, role, open, onClose }: SidebarProps) {
         </a>
       ))}
       {role === "admin" && (
-        <a href="/users" onClick={onClose} className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition text-sm font-medium ${active === "users" ? "bg-blue-600 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}>
-          <span className="text-xl leading-none">👥</span>
-          <span>Users</span>
-        </a>
+        <>
+          <a href="/users" onClick={onClose} className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition text-sm font-medium ${active === "users" ? "bg-blue-600 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}>
+            <span className="text-xl leading-none">👥</span>
+            <span>Users</span>
+          </a>
+          <a href="/settings" onClick={onClose} className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition text-sm font-medium ${active === "settings" ? "bg-blue-600 text-white" : "text-gray-300 hover:bg-gray-700 hover:text-white"}`}>
+            <span className="text-xl leading-none">⚙️</span>
+            <span>Settings</span>
+          </a>
+        </>
       )}
     </nav>
   );
