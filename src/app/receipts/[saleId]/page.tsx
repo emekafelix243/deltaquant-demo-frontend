@@ -137,6 +137,12 @@ export default function ReceiptPage() {
                 <td className="font-semibold text-gray-600 py-1.5 px-3 border border-gray-300 bg-gray-50">Payment</td>
                 <td className="py-1.5 px-3 border border-gray-300 font-medium capitalize">{receipt.payment_method}</td>
               </tr>
+              {receipt.payment_method === "credit" && receipt.customer_name && (
+                <tr>
+                  <td className="font-semibold text-gray-600 py-1.5 px-3 border border-gray-300 bg-gray-50">Customer</td>
+                  <td className="py-1.5 px-3 border border-gray-300 font-medium">{receipt.customer_name}</td>
+                </tr>
+              )}
             </tbody>
           </table>
 

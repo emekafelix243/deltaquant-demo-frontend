@@ -47,6 +47,7 @@ export interface Sale {
 }
 
 // Dedicated ReceiptItem type (matches what the API actually returns)
+
 export interface ReceiptItem {
   id: number;
   product_id: number;
@@ -65,6 +66,7 @@ export interface Receipt {
   generated_at: string;
   items: ReceiptItem[];
   cashier: string;
+  customer_name?: string;
 }
 
 export interface Report {
